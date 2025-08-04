@@ -109,6 +109,13 @@
         </div>
 
         <div class="menu-card">
+            <h3>Staff Management</h3>
+            <p>Add, edit, or remove staff accounts</p>
+            <a href="${pageContext.request.contextPath}/staff-management">Go to Staff Management →</a>
+        </div>
+
+
+        <div class="menu-card">
             <h3>Inventory Management</h3>
             <p>Add, edit, and manage book inventory</p>
             <a href="../itemManagement.jsp">Go to Inventory Management →</a>
