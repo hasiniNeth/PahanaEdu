@@ -1,38 +1,51 @@
 package com.pahanaedubookshop.model;
 
-import java.time.LocalDateTime;
-
 public class Customer {
+    private int customerId;
     private String accountNumber;
-    private String name;
+    private String fullName;
     private String address;
     private String telephone;
-    private LocalDateTime createdAt;
 
-    // Constructors
     public Customer() {}
 
-    public Customer(String accountNumber, String name, String address, String telephone) {
-        this.accountNumber = accountNumber;
-        this.name = name;
-        this.address = address;
-        this.telephone = telephone;
+    public int getCustomerId() {
+        return customerId;
     }
 
-    // Getters and Setters
-    public String getAccountNumber() { return accountNumber; }
-    public void setAccountNumber(String accountNumber) { this.accountNumber = accountNumber; }
+    public void setCustomerId(int customerId) {
+        this.customerId = customerId;
+    }
 
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
+    public String getAccountNumber() {
+        return accountNumber;
+    }
 
-    public String getAddress() { return address; }
-    public void setAddress(String address) { this.address = address; }
+    public void setAccountNumber(String accountNumber) {
+        this.accountNumber = accountNumber;
+    }
 
-    public String getTelephone() { return telephone; }
-    public void setTelephone(String telephone) { this.telephone = telephone; }
+    public String getFullName() {
+        return fullName;
+    }
 
-    public LocalDateTime getCreatedAt() { return createdAt; }
-    public void setCreatedAt(LocalDateTime createdAt) { this.createdAt = createdAt; }
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getTelephone() {
+        return telephone;
+    }
+
+    public void setTelephone(String telephone) {
+        this.telephone = telephone;
+    }
 }

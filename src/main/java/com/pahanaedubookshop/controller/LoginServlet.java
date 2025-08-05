@@ -33,6 +33,7 @@ public class LoginServlet extends HttpServlet {
             if (user != null) {
                 HttpSession session = request.getSession();
                 session.setAttribute("user", user);
+                session.setAttribute("role", user.getRole());
 
                 String redirectPage = "admin".equalsIgnoreCase(user.getRole())
                         ? "adminDashboard.jsp" : "staffDashboard.jsp";

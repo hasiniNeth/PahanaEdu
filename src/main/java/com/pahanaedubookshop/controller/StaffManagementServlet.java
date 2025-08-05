@@ -9,38 +9,51 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet("/staff-management")
 public class StaffManagementServlet extends HttpServlet {
-    private StaffService staffService = new StaffService();
+    private StaffService staffService;
 
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-
-        // Check if user is admin
-        if (!"admin".equals(request.getSession().getAttribute("role"))) {
-            request.setAttribute("error", "Access denied. Admin privileges required.");
-        } else {
-            List<Staff> staffList = staffService.getAllStaff();
-            request.setAttribute("staffList", staffList);
+    @Override
+    public void init() throws ServletException {
+        try {
+            staffService = new StaffService();
+        } catch (SQLException e) {
+            throw new ServletException("Failed to initialize StaffService", e);
         }
-
-        request.getRequestDispatcher("/staff-management.jsp").forward(request, response);
     }
 
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        try {
+            String role = (String) request.getSession().getAttribute("role");
+            if (!"admin".equals(role)) {
+                request.setAttribute("error", "Access denied. Admin privileges required.");
+            } else {
+                List<Staff> staffList = staffService.getAllStaff();
+                request.setAttribute("staffList", staffList);
+            }
+        } catch (Exception e) {
+            request.setAttribute("error", "Error: " + e.getMessage());
+        }
+        request.getRequestDispatcher("/WEB-INF/views/staff-management.jsp").forward(request, response);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // Verify admin role
         if (!"admin".equals(request.getSession().getAttribute("role"))) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Admin access required");
             return;
         }
 
         String action = request.getParameter("action");
-        String message = "";
-        String error = "";
+        String message = null;
+        String error = null;
 
         try {
             switch (action) {
@@ -49,40 +62,35 @@ public class StaffManagementServlet extends HttpServlet {
                     newStaff.setUsername(request.getParameter("username"));
                     newStaff.setPassword(request.getParameter("password"));
                     newStaff.setFullName(request.getParameter("fullName"));
-                    newStaff.setEmail(request.getParameter("email"));
                     newStaff.setRole(request.getParameter("role"));
                     staffService.addStaff(newStaff);
-                    message = "Staff member added successfully";
+                    message = "Staff added successfully.";
                     break;
-
                 case "edit":
                     Staff updatedStaff = new Staff();
                     updatedStaff.setUsername(request.getParameter("username"));
-                    // Only update password if provided
-                    String newPassword = request.getParameter("password");
-                    if (newPassword != null && !newPassword.isEmpty()) {
-                        updatedStaff.setPassword(newPassword);
-                    }
                     updatedStaff.setFullName(request.getParameter("fullName"));
-                    updatedStaff.setEmail(request.getParameter("email"));
                     updatedStaff.setRole(request.getParameter("role"));
+
+                    String password = request.getParameter("password");
+                    if (password != null && !password.isEmpty()) {
+                        updatedStaff.setPassword(password);
+                    }
 
                     String originalUsername = request.getParameter("originalUsername");
                     staffService.updateStaff(originalUsername, updatedStaff);
-                    message = "Staff member updated successfully";
+                    message = "Staff updated successfully.";
                     break;
-
                 case "delete":
-                    String usernameToDelete = request.getParameter("username");
-                    staffService.deleteStaff(usernameToDelete);
-                    message = "Staff member deleted successfully";
+                    String username = request.getParameter("username");
+                    staffService.deleteStaff(username);
+                    message = "Staff deleted successfully.";
                     break;
-
                 default:
-                    error = "Invalid action";
+                    error = "Unknown action.";
             }
         } catch (Exception e) {
-            error = "Error processing request: " + e.getMessage();
+            error = e.getMessage();
         }
 
         request.setAttribute("message", message);

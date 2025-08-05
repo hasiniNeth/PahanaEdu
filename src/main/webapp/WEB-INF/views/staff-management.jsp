@@ -41,7 +41,7 @@
 </c:if>
 
 <!-- Only show management interface to admin -->
-<c:if test="${sessionScope.role eq 'admin'}">
+<c:if test="${not empty sessionScope.role and sessionScope.role eq 'admin'}">
     <!-- Add Staff Form -->
     <div class="form-container admin-only">
         <h2>Add New Staff Member</h2>
@@ -58,10 +58,6 @@
             <div class="form-group">
                 <label>Full Name:</label>
                 <input type="text" name="fullName" required>
-            </div>
-            <div class="form-group">
-                <label>Email:</label>
-                <input type="text" name="email" required>
             </div>
             <div class="form-group">
                 <label>Role:</label>
@@ -81,7 +77,6 @@
         <tr>
             <th>Username</th>
             <th>Full Name</th>
-            <th>Email</th>
             <th>Role</th>
             <th>Actions</th>
         </tr>
@@ -91,7 +86,6 @@
             <tr>
                 <td>${staff.username}</td>
                 <td>${staff.fullName}</td>
-                <td>${staff.email}</td>
                 <td>${staff.role}</td>
                 <td class="action-btns">
                     <button onclick="showEditForm('${staff.username}')">Edit</button>
@@ -104,7 +98,7 @@
             </tr>
             <!-- Edit Form (hidden by default) -->
             <tr id="edit-${staff.username}" style="display: none;">
-                <td colspan="5">
+                <td colspan="4">
                     <form action="staff-management" method="post">
                         <input type="hidden" name="action" value="edit">
                         <input type="hidden" name="originalUsername" value="${staff.username}">
@@ -119,10 +113,6 @@
                         <div class="form-group">
                             <label>Full Name:</label>
                             <input type="text" name="fullName" value="${staff.fullName}" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Email:</label>
-                            <input type="text" name="email" value="${staff.email}" required>
                         </div>
                         <div class="form-group">
                             <label>Role:</label>
