@@ -2,33 +2,36 @@ package com.pahanaedubookshop.service;
 
 import com.pahanaedubookshop.dao.StaffDao;
 import com.pahanaedubookshop.model.Staff;
-import com.pahanaedubookshop.util.DatabaseConnection;
 
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 
 public class StaffService {
-    private final StaffDao staffDao;
 
-    public StaffService() throws SQLException {
-        Connection conn = DatabaseConnection.getInstance().getConnection();
-        this.staffDao = new StaffDao(conn);
-    }
+    private final StaffDao staffDao = new StaffDao();
 
-    public List<Staff> getAllStaff() throws SQLException {
-        return staffDao.getAllStaff();
-    }
-
+    // Add new staff (admin use only)
     public void addStaff(Staff staff) throws SQLException {
         staffDao.addStaff(staff);
     }
 
-    public void updateStaff(String originalUsername, Staff staff) throws SQLException {
-        staffDao.updateStaff(originalUsername, staff);
+    // Get list of all staff
+    public List<Staff> getAllStaff() throws SQLException {
+        return staffDao.getAllStaff();
     }
 
-    public void deleteStaff(String username) throws SQLException {
-        staffDao.deleteStaff(username);
+    // Get staff member by ID
+    public Staff getStaffById(int id) throws SQLException {
+        return staffDao.getStaffById(id);
+    }
+
+    // Update existing staff details
+    public void updateStaff(Staff staff) throws SQLException {
+        staffDao.updateStaff(staff);
+    }
+
+    // Delete staff by ID
+    public void deleteStaff(int id) throws SQLException {
+        staffDao.deleteStaff(id);
     }
 }

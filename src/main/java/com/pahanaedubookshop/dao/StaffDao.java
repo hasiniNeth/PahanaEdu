@@ -1,27 +1,41 @@
 package com.pahanaedubookshop.dao;
 
 import com.pahanaedubookshop.model.Staff;
+import com.pahanaedubookshop.util.DatabaseConnection;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class StaffDao {
-    private final Connection conn;
 
-    public StaffDao(Connection conn) {
-        this.conn = conn;
+    public void addStaff(Staff staff) throws SQLException {
+        String sql = "INSERT INTO users (username, password, role, full_name) VALUES (?, ?, ?, ?)";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, staff.getUsername());
+            stmt.setString(2, staff.getPassword());
+            stmt.setString(3, "staff"); // Always staff
+            stmt.setString(4, staff.getFullName());
+            stmt.executeUpdate();
+        }
     }
 
     public List<Staff> getAllStaff() throws SQLException {
         List<Staff> staffList = new ArrayList<>();
-        String sql = "SELECT user_id, username, full_name, role FROM users WHERE role IN ('staff', 'admin')";
-        try (PreparedStatement stmt = conn.prepareStatement(sql);
+        String sql = "SELECT * FROM users WHERE role = 'staff'";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
+
             while (rs.next()) {
                 Staff staff = new Staff();
                 staff.setUserId(rs.getInt("user_id"));
                 staff.setUsername(rs.getString("username"));
+                staff.setPassword(rs.getString("password")); // Optional
                 staff.setFullName(rs.getString("full_name"));
                 staff.setRole(rs.getString("role"));
                 staffList.add(staff);
@@ -30,42 +44,64 @@ public class StaffDao {
         return staffList;
     }
 
-    public void addStaff(Staff staff) throws SQLException {
-        String sql = "INSERT INTO users (username, password, full_name, role) VALUES (?, ?, ?, ?)";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
+    public void updateStaff(Staff staff) throws SQLException {
+        String sql;
+        boolean updatePassword = staff.getPassword() != null && !staff.getPassword().isEmpty();
+
+        if (updatePassword) {
+            sql = "UPDATE users SET username = ?, password = ?, full_name = ? WHERE user_id = ?";
+        } else {
+            sql = "UPDATE users SET username = ?, full_name = ? WHERE user_id = ?";
+        }
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
             stmt.setString(1, staff.getUsername());
-            stmt.setString(2, staff.getPassword());
-            stmt.setString(3, staff.getFullName());
-            stmt.setString(4, staff.getRole());
+
+            int index = 2;
+            if (updatePassword) {
+                stmt.setString(index++, staff.getPassword());
+            }
+
+            stmt.setString(index++, staff.getFullName());
+            stmt.setInt(index, staff.getUserId());
+
             stmt.executeUpdate();
         }
     }
 
-    public void updateStaff(String originalUsername, Staff updatedStaff) throws SQLException {
-        String sql = "UPDATE users SET username=?, full_name=?, role=? WHERE username=?";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, updatedStaff.getUsername());
-            stmt.setString(2, updatedStaff.getFullName());
-            stmt.setString(4, updatedStaff.getRole());
-            stmt.setString(5, originalUsername);
+
+    public void deleteStaff(int userId) throws SQLException {
+        String sql = "DELETE FROM users WHERE user_id = ? AND role = 'staff'";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
             stmt.executeUpdate();
         }
+    }
 
-        if (updatedStaff.getPassword() != null && !updatedStaff.getPassword().isEmpty()) {
-            String pwdSql = "UPDATE users SET password=? WHERE username=?";
-            try (PreparedStatement stmt = conn.prepareStatement(pwdSql)) {
-                stmt.setString(1, updatedStaff.getPassword());
-                stmt.setString(2, updatedStaff.getUsername());
-                stmt.executeUpdate();
+    public Staff getStaffById(int userId) throws SQLException {
+        String sql = "SELECT * FROM users WHERE user_id = ? AND role = 'staff'";
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, userId);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    Staff staff = new Staff();
+                    staff.setUserId(rs.getInt("user_id"));
+                    staff.setUsername(rs.getString("username"));
+                    staff.setPassword(rs.getString("password"));
+                    staff.setFullName(rs.getString("full_name"));
+                    staff.setRole(rs.getString("role"));
+                    return staff;
+                }
             }
         }
-    }
-
-    public void deleteStaff(String username) throws SQLException {
-        String sql = "DELETE FROM users WHERE username=? AND role IN ('staff', 'admin')";
-        try (PreparedStatement stmt = conn.prepareStatement(sql)) {
-            stmt.setString(1, username);
-            stmt.executeUpdate();
-        }
+        return null;
     }
 }
