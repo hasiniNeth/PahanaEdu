@@ -108,4 +108,25 @@ public class CustomerDAO {
         }
         return "CUST1001";
     }
+
+    public Customer getCustomerByAccountNumber(String accountNumber) throws SQLException {
+        String sql = "SELECT * FROM customers WHERE account_number = ?";
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, accountNumber);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                Customer customer = new Customer();
+                customer.setCustomerId(rs.getInt("customer_id"));
+                customer.setAccountNumber(rs.getString("account_number"));
+                customer.setFullName(rs.getString("full_name"));
+                customer.setAddress(rs.getString("address"));
+                customer.setTelephone(rs.getString("telephone"));
+                return customer;
+            }
+        }
+        return null;
+    }
 }
