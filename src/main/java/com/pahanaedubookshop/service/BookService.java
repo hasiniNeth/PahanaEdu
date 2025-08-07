@@ -20,7 +20,7 @@ public class BookService {
     }
 
     public void addBook(Book book) throws SQLException {
-        bookDao.addBook(book);
+        bookDao.insertBook(book);
     }
 
     public void updateBook(Book book) throws SQLException {
