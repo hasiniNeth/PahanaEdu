@@ -6,8 +6,8 @@ public class Book {
     private String author;
     private String isbn;
     private double price;
+    private int stock;
 
-    // Getters and setters
     public int getBookId() { return bookId; }
     public void setBookId(int bookId) { this.bookId = bookId; }
 
@@ -22,4 +22,7 @@ public class Book {
 
     public double getPrice() { return price; }
     public void setPrice(double price) { this.price = price; }
+
+    public int getStock() { return stock; }
+    public void setStock(int stock) { this.stock = stock; }
 }
