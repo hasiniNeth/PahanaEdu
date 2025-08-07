@@ -223,7 +223,7 @@
             <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
             <li><a href="customer-management"><i class="fas fa-users"></i> Customers</a></li>
             <li><a href="book-management"><i class="fas fa-book"></i> Inventory</a></li>
-            <li><a href="../billing.jsp"><i class="fas fa-receipt"></i> Billing</a></li>
+            <li><a href="bill-create"><i class="fas fa-receipt"></i> Billing</a></li>
             <li><a href="../inventory.jsp"><i class="fas fa-search"></i> Lookup</a></li>
             <li><a href="../help.jsp"><i class="fas fa-question-circle"></i> Help</a></li>
         </ul>
@@ -251,7 +251,7 @@
             </div>
 
             <div class="menu-card">
-                <h3>Inventory Management</h3>
+                <h3>Book Management</h3>
                 <p>Add, edit, and manage book inventory</p>
                 <a href="<%= request.getContextPath() %>/book-management">Go to Inventory Management →</a>
             </div>
@@ -259,7 +259,7 @@
             <div class="menu-card">
                 <h3>Billing System</h3>
                 <p>Create and manage customer bills</p>
-                <a href="../billing.jsp">Go to Billing →</a>
+                <a href="<%= request.getContextPath() %>/bill-create">Go to Billing →</a>
             </div>
 
             <div class="menu-card">
@@ -278,7 +278,7 @@
         <div class="quick-actions">
             <h3>Quick Actions</h3>
             <ul>
-                <li><a href="../billing.jsp?action=new">Create New Bill</a></li>
+                <li><a href="../bill-create.jsp?action=new">Create New Bill</a></li>
                 <li><a href="../customer-management.jsp?action=add">Add New Customer</a></li>
                 <li><a href="../inventory.jsp?filter=low">View Low Stock Items</a></li>
             </ul>
