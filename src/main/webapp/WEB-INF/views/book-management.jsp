@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, com.pahanaedubookshop.model.Book" %>
 <%
-    List<Book> bookList = (List<Book>) request.getAttribute("bookList");
+    List<Book> bookList = (List<Book>) request.getAttribute("books");
     Book editingBook = (Book) request.getAttribute("editingBook");
     String message = (String) request.getAttribute("message");
     String error = (String) request.getAttribute("error");
@@ -37,13 +37,13 @@
 <p class="error"><%= error %></p>
 <% } %>
 
-<!-- Add Book Form -->
+<!-- Add/Edit Book Form -->
 <div class="form-section">
     <h3><%= editingBook != null ? "Edit Book" : "Add New Book" %></h3>
     <form method="post" action="book-management">
         <input type="hidden" name="action" value="<%= editingBook != null ? "update" : "add" %>" />
         <% if (editingBook != null) { %>
-        <input type="hidden" name="id" value="<%= editingBook.getBookId() %>" />
+        <input type="hidden" name="bookId" value="<%= editingBook.getBookId() %>" />
         <% } %>
         Title: <input type="text" name="title" value="<%= editingBook != null ? editingBook.getTitle() : "" %>" required /><br/><br/>
         Author: <input type="text" name="author" value="<%= editingBook != null ? editingBook.getAuthor() : "" %>" /><br/><br/>
@@ -80,7 +80,7 @@
             |
             <form method="post" action="book-management" style="display:inline;" onsubmit="return confirm('Delete this book?');">
                 <input type="hidden" name="action" value="delete" />
-                <input type="hidden" name="id" value="<%= book.getBookId() %>" />
+                <input type="hidden" name="bookId" value="<%= book.getBookId() %>" />
                 <input type="submit" value="Delete" />
             </form>
             <% } %>
