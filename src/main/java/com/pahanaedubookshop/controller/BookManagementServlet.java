@@ -17,13 +17,26 @@ public class BookManagementServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        String action = request.getParameter("action");
+
         try {
-            List<Book> books = bookDao.getAllBooks();
-            request.setAttribute("books", books);
+            if ("edit".equals(action)) {
+                int bookId = Integer.parseInt(request.getParameter("id"));
+                Book book = bookDao.getBookById(bookId);
+                request.setAttribute("book", book);
+                request.getRequestDispatcher("/WEB-INF/views/edit-book.jsp").forward(request, response);
+                return;
+
+            } else {
+                // Default action: show list
+                List<Book> books = bookDao.getAllBooks();
+                request.setAttribute("books", books);
+                request.getRequestDispatcher("/WEB-INF/views/book-management.jsp").forward(request, response);
+            }
         } catch (SQLException e) {
             request.setAttribute("error", e.getMessage());
+            request.getRequestDispatcher("/WEB-INF/views/book-management.jsp").forward(request, response);
         }
-        request.getRequestDispatcher("/WEB-INF/views/book-management.jsp").forward(request, response);
     }
 
     @Override
