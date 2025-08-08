@@ -93,7 +93,7 @@ public class BillControllerServlet extends HttpServlet {
                 }
 
             } else if ("printBill".equals(action)) {
-                Customer customer = (Customer) request.getAttribute("customer");
+                Customer customer = (Customer) session.getAttribute("selectedCustomer");
                 if (customer != null && !cart.isEmpty()) {
                     Bill bill = new Bill();
                     bill.setCustomerId(customer.getCustomerId());
@@ -103,9 +103,14 @@ public class BillControllerServlet extends HttpServlet {
 
                     billService.saveBill(bill);
 
+                    // Save the bill in session
+                    session.setAttribute("recentBill", bill);
                     session.removeAttribute("cart");
                     session.removeAttribute("selectedCustomer");
-                    request.setAttribute("message", "Bill generated successfully!");
+
+                    // ✅ FORWARD to the JSP (NOT redirect)
+                    request.getRequestDispatcher("/WEB-INF/views/receipt.jsp").forward(request, response);
+                    return; // prevent fallback forwarding
                 } else {
                     request.setAttribute("error", "No customer or bill items found");
                 }
