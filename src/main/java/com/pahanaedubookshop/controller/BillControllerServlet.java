@@ -41,7 +41,12 @@ public class BillControllerServlet extends HttpServlet {
                 String keyword = request.getParameter("keyword");
                 List<Book> books = bookDao.searchBooksByKeyword(keyword);
                 request.setAttribute("searchResults", books);
+
+                // Pass the customer back to the JSP
+                Customer customer = (Customer) request.getSession().getAttribute("selectedCustomer");
+                request.setAttribute("customer", customer);
             }
+
         } catch (SQLException e) {
             request.setAttribute("error", e.getMessage());
         }
