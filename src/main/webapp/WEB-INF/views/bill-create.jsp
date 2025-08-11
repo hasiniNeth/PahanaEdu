@@ -327,7 +327,7 @@
         <td><%= book.getTitle() %></td>
         <td><%= book.getAuthor() %></td>
         <td><%= book.getIsbn() %></td>
-        <td>$<%= String.format("%.2f", book.getPrice()) %></td>
+        <td>Rs. <%= String.format("%.2f", book.getPrice()) %></td>
         <td><%= book.getStock() %></td>
         <td>
           <form action="bill-create" method="post" class="action-form">
@@ -367,8 +367,8 @@
       <tr>
         <td><%= item.getBookTitle() %></td>
         <td><%= item.getQuantity() %></td>
-        <td>$<%= String.format("%.2f", item.getPrice()) %></td>
-        <td>$<%= String.format("%.2f", item.getSubtotal()) %></td>
+        <td>Rs. <%= String.format("%.2f", item.getPrice()) %></td>
+        <td>Rs. <%= String.format("%.2f", item.getSubtotal()) %></td>
         <td>
           <form action="bill-create" method="post" class="action-form">
             <input type="hidden" name="action" value="removeItem" />
@@ -380,7 +380,7 @@
       <% } %>
       <tr class="total-row">
         <td colspan="3" style="text-align:right;"><strong>Total:</strong></td>
-        <td>$<%= String.format("%.2f", total) %></td>
+        <td>Rs. <%= String.format("%.2f", total) %></td>
         <td></td>
       </tr>
       </tbody>
