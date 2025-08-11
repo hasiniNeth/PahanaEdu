@@ -329,7 +329,7 @@
             <td><%= book.getTitle() %></td>
             <td><%= book.getAuthor() %></td>
             <td><%= book.getIsbn() %></td>
-            <td>$<%= String.format("%.2f", book.getPrice()) %></td>
+            <td>Rs. <%= String.format("%.2f", book.getPrice()) %></td>
             <td><%= book.getStock() %></td>
             <td>
                 <a href="book-management?action=edit&id=<%= book.getBookId() %>" class="action-btn">Edit</a>
