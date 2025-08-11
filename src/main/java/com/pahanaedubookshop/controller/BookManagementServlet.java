@@ -1,6 +1,8 @@
 package com.pahanaedubookshop.controller;
 
 import com.pahanaedubookshop.dao.BookDao;
+import com.pahanaedubookshop.factory.DefaultModelFactory;
+import com.pahanaedubookshop.factory.ModelFactory;
 import com.pahanaedubookshop.model.Book;
 
 import javax.servlet.ServletException;
@@ -13,6 +15,7 @@ import java.util.List;
 @WebServlet("/book-management")
 public class BookManagementServlet extends HttpServlet {
     private final BookDao bookDao = new BookDao();
+    private final ModelFactory modelFactory = DefaultModelFactory.INSTANCE;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -21,14 +24,17 @@ public class BookManagementServlet extends HttpServlet {
 
         try {
             if ("edit".equals(action)) {
-                int bookId = Integer.parseInt(request.getParameter("id"));
+                // note: we expect param name "id" or "bookId" based on your HTML - be consistent
+                String idParam = request.getParameter("id");
+                if (idParam == null) {
+                    idParam = request.getParameter("bookId");
+                }
+                int bookId = Integer.parseInt(idParam);
                 Book book = bookDao.getBookById(bookId);
                 request.setAttribute("book", book);
                 request.getRequestDispatcher("/WEB-INF/views/edit-book.jsp").forward(request, response);
                 return;
-
             } else {
-                // Default action: show list
                 List<Book> books = bookDao.getAllBooks();
                 request.setAttribute("books", books);
                 request.getRequestDispatcher("/WEB-INF/views/book-management.jsp").forward(request, response);
@@ -46,7 +52,7 @@ public class BookManagementServlet extends HttpServlet {
 
         try {
             if ("add".equals(action)) {
-                Book book = new Book();
+                Book book = modelFactory.createBook();
                 book.setTitle(request.getParameter("title"));
                 book.setAuthor(request.getParameter("author"));
                 book.setIsbn(request.getParameter("isbn"));
@@ -57,8 +63,11 @@ public class BookManagementServlet extends HttpServlet {
                 response.sendRedirect("book-management?message=Book added successfully");
 
             } else if ("update".equals(action)) {
-                Book book = new Book();
-                book.setBookId(Integer.parseInt(request.getParameter("bookId")));
+                Book book = modelFactory.createBook();
+                // ensure the form passes "bookId" or "id" consistently
+                String bid = request.getParameter("bookId");
+                if (bid == null) bid = request.getParameter("id");
+                book.setBookId(Integer.parseInt(bid));
                 book.setTitle(request.getParameter("title"));
                 book.setAuthor(request.getParameter("author"));
                 book.setIsbn(request.getParameter("isbn"));
@@ -69,7 +78,9 @@ public class BookManagementServlet extends HttpServlet {
                 response.sendRedirect("book-management?message=Book updated successfully");
 
             } else if ("delete".equals(action)) {
-                int bookId = Integer.parseInt(request.getParameter("bookId"));
+                String bid = request.getParameter("bookId");
+                if (bid == null) bid = request.getParameter("id");
+                int bookId = Integer.parseInt(bid);
                 bookDao.deleteBook(bookId);
                 response.sendRedirect("book-management?message=Book deleted successfully");
             }
