@@ -324,10 +324,10 @@
         <h2>Staff Menu</h2>
         <ul class="nav-menu">
             <li><a href="#" class="active"><i class="fas fa-home"></i> Dashboard</a></li>
-            <li><a href="customer-management"><i class="fas fa-users"></i> Customers</a></li>
-            <li><a href="book-management"><i class="fas fa-book"></i> Inventory</a></li>
-            <li><a href="bill-create"><i class="fas fa-receipt"></i> Billing</a></li>
-            <li><a href="../help.jsp"><i class="fas fa-question-circle"></i> Help</a></li>
+            <li><a href="<%= request.getContextPath() %>/customer-management"><i class="fas fa-users"></i> Customers</a></li>
+            <li><a href="<%= request.getContextPath() %>/book-management"><i class="fas fa-book"></i> Inventory</a></li>
+            <li><a href="<%= request.getContextPath() %>/bill-create"><i class="fas fa-receipt"></i> Billing</a></li>
+            <li><a href="<%= request.getContextPath() %>/help.jsp"><i class="fas fa-question-circle"></i> Help</a></li>
         </ul>
     </div>
 </div>
@@ -367,7 +367,7 @@
             <div class="menu-card">
                 <h3>Help Center</h3>
                 <p>Get assistance with the system and operations</p>
-                <a href="../help.jsp">Get Help</a>
+                <a href="<%= request.getContextPath() %>/help.jsp">Get Help</a>
             </div>
         </div>
 
