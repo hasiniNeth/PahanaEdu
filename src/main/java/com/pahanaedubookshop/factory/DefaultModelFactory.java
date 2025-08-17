@@ -1,10 +1,6 @@
 package com.pahanaedubookshop.factory;
 
 import com.pahanaedubookshop.model.Book;
-import com.pahanaedubookshop.model.Customer;
-import com.pahanaedubookshop.model.Staff;
-import com.pahanaedubookshop.model.Bill;
-import com.pahanaedubookshop.model.BillItem;
 
 /**
  * Very small singleton factory returning plain model instances.
@@ -21,25 +17,5 @@ public final class DefaultModelFactory implements ModelFactory {
     @Override
     public Book createBook() {
         return new Book();
-    }
-
-    @Override
-    public Customer createCustomer() {
-        return new Customer();
-    }
-
-    @Override
-    public Staff createStaff() {
-        return new Staff();
-    }
-
-    @Override
-    public Bill createBill() {
-        return new Bill();
-    }
-
-    @Override
-    public BillItem createBillItem() {
-        return new BillItem();
     }
 }
