@@ -7,12 +7,15 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="com.pahanaedubookshop.model.User" %>
+<%@ page import="java.util.*, com.pahanaedubookshop.model.Customer, com.pahanaedubookshop.model.User" %>
+
 <%
     User user = (User) session.getAttribute("user");
     if (user == null) {
         response.sendRedirect("login.jsp");
         return;
     }
+    String userRole = (user != null) ? user.getRole() : "";
 %>
 <!DOCTYPE html>
 <html>
@@ -63,7 +66,7 @@
         ul {
             margin-left: 1.5rem;
         }
-        .back-link {
+        .back-btn {
             display: inline-block;
             margin-top: 2rem;
             padding: 0.6rem 1.2rem;
@@ -73,7 +76,7 @@
             border-radius: 6px;
             transition: background 0.3s ease;
         }
-        .back-link:hover {
+        .back-btn:hover {
             background: #d91a6b;
         }
     </style>
@@ -130,7 +133,8 @@
         <li>Click the "Logout" button at the top right to securely exit the system.</li>
     </ul>
 
-    <a href="<%= request.getContextPath() %>/admin-dashboard.jsp" class="back-link">← Back to Dashboard</a>
+    <!-- Back to Dashboard Button -->
+    <a class="back-btn" href="<%= request.getContextPath() %>/<%= "admin".equalsIgnoreCase(userRole) ? "adminDashboard.jsp" : "staffDashboard.jsp" %>">← Back to Dashboard</a>
 </div>
 
 </body>
