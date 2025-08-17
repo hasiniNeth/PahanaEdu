@@ -147,6 +147,15 @@
             font-size: 1.1rem;
         }
 
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -214,6 +223,7 @@
         <div class="form-actions">
             <input type="submit" value="Update Book" />
             <a href="book-management" class="btn-cancel">Cancel</a>
+            <a href="book-management" class="btn-back">Back to Book Management</a>
         </div>
     </form>
     <% } else { %>
