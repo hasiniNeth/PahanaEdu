@@ -5,7 +5,7 @@
     <style>
         :root {
             --primary-color: #2c3e50;
-            --secondary-color: #3498db;
+            --secondary-color: #126ba7;
             --accent-color: #e74c3c;
             --light-bg: #f5f7fa;
             --dark-text: #2c3e50;
