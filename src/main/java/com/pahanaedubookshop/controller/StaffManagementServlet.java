@@ -1,6 +1,5 @@
 package com.pahanaedubookshop.controller;
 
-import com.pahanaedubookshop.dao.StaffDao;
 import com.pahanaedubookshop.model.Staff;
 import com.pahanaedubookshop.service.StaffService;
 
@@ -8,14 +7,12 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.List;
 
 @WebServlet("/staff-management")
 public class StaffManagementServlet extends HttpServlet {
 
-    private final StaffDao staffDao = new StaffDao();
-    private final StaffService staffService = new StaffService(); // ✅ FIXED
+    private final StaffService staffService = new StaffService();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -34,22 +31,33 @@ public class StaffManagementServlet extends HttpServlet {
 
             List<Staff> staffList = staffService.getAllStaff();
             request.setAttribute("staffList", staffList);
-            request.setAttribute("message", request.getParameter("message"));
-            request.setAttribute("error", request.getParameter("error"));
 
         } catch (Exception e) {
             request.setAttribute("error", "Error: " + e.getMessage());
         }
 
+        // ✅ Pass query parameter errors/messages to the JSP
+        String errorParam = request.getParameter("error");
+        if (errorParam != null && !errorParam.trim().isEmpty()) {
+            request.setAttribute("error", errorParam);
+        }
+
+        String messageParam = request.getParameter("message");
+        if (messageParam != null && !messageParam.trim().isEmpty()) {
+            request.setAttribute("message", messageParam);
+        }
+
         request.getRequestDispatcher("/WEB-INF/views/staff-management.jsp").forward(request, response);
     }
+
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Role check for admin-only actions
         String role = (String) request.getSession().getAttribute("role");
-        if (!"admin".equals(role)) {
+        if (!"admin".equalsIgnoreCase(role)) {
             response.sendError(HttpServletResponse.SC_FORBIDDEN, "Access Denied");
             return;
         }
@@ -57,17 +65,17 @@ public class StaffManagementServlet extends HttpServlet {
         String action = request.getParameter("action");
 
         try {
-            if ("add".equals(action)) {
+            if ("add".equalsIgnoreCase(action)) {
                 Staff staff = new Staff();
                 staff.setUsername(request.getParameter("username"));
                 staff.setPassword(request.getParameter("password"));
                 staff.setFullName(request.getParameter("fullName"));
-                staff.setRole("staff");
+                staff.setRole("staff"); // Always assign "staff" role
 
                 staffService.addStaff(staff);
                 response.sendRedirect("staff-management?message=Staff added successfully");
 
-            } else if ("update".equals(action)) {
+            } else if ("update".equalsIgnoreCase(action)) {
                 Staff staff = new Staff();
                 staff.setUserId(Integer.parseInt(request.getParameter("id")));
                 staff.setUsername(request.getParameter("username"));
@@ -81,12 +89,17 @@ public class StaffManagementServlet extends HttpServlet {
                 staffService.updateStaff(staff);
                 response.sendRedirect("staff-management?message=Staff updated successfully");
 
-            } else if ("delete".equals(action)) {
+            } else if ("delete".equalsIgnoreCase(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
                 staffService.deleteStaff(id);
                 response.sendRedirect("staff-management?message=Staff deleted successfully");
+
+            } else {
+                response.sendRedirect("staff-management?error=Invalid action");
             }
 
+        } catch (NumberFormatException e) {
+            response.sendRedirect("staff-management?error=Invalid ID format");
         } catch (Exception e) {
             response.sendRedirect("staff-management?error=" + e.getMessage());
         }
