@@ -18,6 +18,8 @@
   String message = (String) request.getAttribute("message");
   String error = (String) request.getAttribute("error");
   double total = (billItems != null) ? billItems.stream().mapToDouble(BillItem::getSubtotal).sum() : 0.0;
+  User user = (User) session.getAttribute("user");
+  String userRole = (user != null) ? user.getRole() : "";
 %>
 
 <!DOCTYPE html>
@@ -66,20 +68,18 @@
     }
 
     .success {
-      color: var(--light-text);
-      background-color: var(--success-color);
+      color: var(--success-color);
       padding: 12px 15px;
       border-radius: 6px;
-      margin-bottom: 25px;
+      margin: 15px 0;
       display: inline-block;
     }
 
     .error {
-      color: var(--light-text);
-      background-color: var(--error-color);
+      color: var(--error-color);
       padding: 12px 15px;
       border-radius: 6px;
-      margin-bottom: 25px;
+      margin: 15px 0;
       display: inline-block;
     }
 
@@ -226,6 +226,28 @@
       display: inline;
     }
 
+    .back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+      padding: 10px 20px;
+      background-color: var(--primary-color);
+      color: white;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+
+    .back-btn:hover {
+      background-color: #126ba7;
+      color: white;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      text-decoration: none;
+    }
+
     /* Responsive adjustments */
     @media (max-width: 768px) {
       body {
@@ -270,6 +292,9 @@
   <% if (error != null) { %>
   <p class="error"><%= error %></p>
   <% } %>
+
+  <!-- Back to Dashboard Button -->
+  <a class="back-btn" href="<%= request.getContextPath() %>/<%= "admin".equalsIgnoreCase(userRole) ? "adminDashboard.jsp" : "staffDashboard.jsp" %>">← Back to Dashboard</a>
 
   <!-- Customer Search -->
   <div class="form-section">
