@@ -1,11 +1,14 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, com.pahanaedubookshop.model.Book" %>
+<%@ page import="java.util.*, com.pahanaedubookshop.model.Customer, com.pahanaedubookshop.model.User" %>
 <%
     List<Book> bookList = (List<Book>) request.getAttribute("books");
     Book editingBook = (Book) request.getAttribute("editingBook");
     String message = (String) request.getAttribute("message");
     String error = (String) request.getAttribute("error");
     String role = (String) session.getAttribute("role");
+    User user = (User) session.getAttribute("user");
+    String userRole = (user != null) ? user.getRole() : "";
 %>
 
 <!DOCTYPE html>
@@ -65,8 +68,7 @@
         }
 
         .success {
-            color: var(--light-text);
-            background-color: var(--success-color);
+            color: var(--success-color);
             padding: 12px 15px;
             border-radius: 6px;
             margin: 15px 0;
@@ -74,8 +76,7 @@
         }
 
         .error {
-            color: var(--light-text);
-            background-color: var(--error-color);
+            color: var(--error-color);
             padding: 12px 15px;
             border-radius: 6px;
             margin: 15px 0;
@@ -225,6 +226,28 @@
             margin: 0 10px;
         }
 
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #126ba7;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             body {
@@ -267,6 +290,10 @@
 <div class="container">
     <h2>Book Management</h2>
 
+    <!-- Back to Dashboard Button -->
+    <a class="back-btn" href="<%= request.getContextPath() %>/<%= "admin".equalsIgnoreCase(userRole) ? "adminDashboard.jsp" : "staffDashboard.jsp" %>">← Back to Dashboard</a>
+
+
     <% if (message != null) { %>
     <p class="success"><%= message %></p>
     <% } %>
@@ -277,26 +304,37 @@
     <!-- Add/Edit Book Form -->
     <div class="form-section">
         <h3><%= editingBook != null ? "Edit Book" : "Add New Book" %></h3>
-        <form method="post" action="book-management">
+        <form method="post" action="book-management" onsubmit="return validateBookForm();">
             <input type="hidden" name="action" value="<%= editingBook != null ? "update" : "add" %>" />
             <% if (editingBook != null) { %>
             <input type="hidden" name="bookId" value="<%= editingBook.getBookId() %>" />
             <% } %>
 
             <label for="title">Title:</label>
-            <input type="text" id="title" name="title" value="<%= editingBook != null ? editingBook.getTitle() : "" %>" required />
+            <input type="text" id="title" name="title"
+                   value="<%= editingBook != null ? editingBook.getTitle() : "" %>"
+                   required minlength="2" maxlength="100" />
 
             <label for="author">Author:</label>
-            <input type="text" id="author" name="author" value="<%= editingBook != null ? editingBook.getAuthor() : "" %>" />
+            <input type="text" id="author" name="author"
+                   value="<%= editingBook != null ? editingBook.getAuthor() : "" %>"
+                   maxlength="100" />
 
             <label for="isbn">ISBN:</label>
-            <input type="text" id="isbn" name="isbn" value="<%= editingBook != null ? editingBook.getIsbn() : "" %>" />
+            <input type="text" id="isbn" name="isbn"
+                   value="<%= editingBook != null ? editingBook.getIsbn() : "" %>"
+                   pattern="^[0-9\-]{10,13}$"
+                   title="ISBN must be 10–13 digits, numbers and dashes only." />
 
             <label for="price">Price:</label>
-            <input type="number" id="price" name="price" step="0.01" value="<%= editingBook != null ? editingBook.getPrice() : "" %>" required />
+            <input type="number" id="price" name="price" step="0.01" min="1"
+                   value="<%= editingBook != null ? editingBook.getPrice() : "" %>"
+                   required />
 
             <label for="stock">Stock:</label>
-            <input type="number" id="stock" name="stock" value="<%= editingBook != null ? editingBook.getStock() : "" %>" required />
+            <input type="number" id="stock" name="stock" min="0"
+                   value="<%= editingBook != null ? editingBook.getStock() : "" %>"
+                   required />
 
             <input type="submit" value="<%= editingBook != null ? "Update Book" : "Add Book" %>" />
             <% if (editingBook != null) { %>
@@ -347,6 +385,45 @@
         </tbody>
     </table>
     <% } %>
+
+    <script>
+        function validateBookForm() {
+            let title = document.getElementById("title").value.trim();
+            let price = document.getElementById("price").value;
+            let stock = document.getElementById("stock").value;
+            let isbn = document.getElementById("isbn").value.trim();
+
+            // Title validation
+            if (title.length < 2) {
+                alert("Book title must be at least 2 characters long.");
+                return false;
+            }
+
+            // Price validation
+            if (price <= 0) {
+                alert("Price must be greater than 0.");
+                return false;
+            }
+
+            // Stock validation
+            if (stock <= 0) {
+                alert("Stock cannot be zero or negative.");
+                return false;
+            }
+
+            // ISBN validation (if entered)
+            if (isbn.length > 0) {
+                let isbnPattern = /^[0-9\-]{10,13}$/;
+                if (!isbnPattern.test(isbn)) {
+                    alert("ISBN must be 10–13 characters, only digits and dashes.");
+                    return false;
+                }
+            }
+
+            return true; // ✅ Allow submit
+        }
+    </script>
+
 </div>
 </body>
 </html>
