@@ -9,7 +9,32 @@ import java.util.List;
 
 public class BookDao {
 
+    // Check if ISBN already exists (optionally exclude one book for update)
+    public boolean isIsbnTaken(String isbn, Integer excludeId) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM books WHERE isbn = ?";
+        if (excludeId != null) {
+            sql += " AND book_id <> ?";
+        }
+
+        try (Connection conn = DatabaseConnection.getInstance().getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            stmt.setString(1, isbn);
+            if (excludeId != null) {
+                stmt.setInt(2, excludeId);
+            }
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                return rs.getInt(1) > 0; // true if ISBN already exists
+            }
+        }
+        return false;
+    }
+
     public void insertBook(Book book) throws SQLException {
+        if (book.getIsbn() != null && !book.getIsbn().isEmpty() && isIsbnTaken(book.getIsbn(), null)) {
+            throw new SQLException("A book with ISBN '" + book.getIsbn() + "' already exists.");
+        }
+
         String sql = "INSERT INTO books (title, author, isbn, price, stock) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -23,6 +48,10 @@ public class BookDao {
     }
 
     public void updateBook(Book book) throws SQLException {
+        if (book.getIsbn() != null && !book.getIsbn().isEmpty() && isIsbnTaken(book.getIsbn(), book.getBookId())) {
+            throw new SQLException("Another book with ISBN '" + book.getIsbn() + "' already exists.");
+        }
+
         String sql = "UPDATE books SET title = ?, author = ?, isbn = ?, price = ?, stock = ? WHERE book_id = ?";
         try (Connection conn = DatabaseConnection.getInstance().getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
