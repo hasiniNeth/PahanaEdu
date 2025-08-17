@@ -40,12 +40,18 @@ public class BillControllerServlet extends HttpServlet {
             } else if ("searchBooks".equals(action)) {
                 String keyword = request.getParameter("keyword");
                 List<Book> books = bookDao.searchBooksByKeyword(keyword);
-                request.setAttribute("searchResults", books);
+
+                if (books == null || books.isEmpty()) {
+                    request.setAttribute("error", "No books found matching \"" + keyword + "\".");
+                } else {
+                    request.setAttribute("searchResults", books);
+                }
 
                 // Pass the customer back to the JSP
                 Customer customer = (Customer) request.getSession().getAttribute("selectedCustomer");
                 request.setAttribute("customer", customer);
             }
+
 
         } catch (SQLException e) {
             request.setAttribute("error", e.getMessage());
