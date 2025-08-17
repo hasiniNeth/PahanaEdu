@@ -7,10 +7,35 @@
 --%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.*, com.pahanaedubookshop.model.Staff" %>
+<%@ page import="java.util.*, com.pahanaedubookshop.model.Customer, com.pahanaedubookshop.model.User" %>
+
+
 <%
     List<Staff> staffList = (List<Staff>) request.getAttribute("staffList");
     String message = (String) request.getAttribute("message");
+    User user = (User) session.getAttribute("user");
+    String userRole = (user != null) ? user.getRole() : "";
 %>
+<%
+    String error = (String) request.getAttribute("error");
+
+    if (error != null && !error.trim().isEmpty()) {
+%>
+<div style="color:red; font-weight:bold;">
+    <%= error %>
+</div>
+<%
+    }
+
+    if (message != null && !message.trim().isEmpty()) {
+%>
+<div style="color:green; font-weight:bold;">
+    <%= message %>
+</div>
+<%
+    }
+%>
+
 <!DOCTYPE html>
 <html>
 <head>
@@ -202,6 +227,28 @@
             margin: 0 10px;
         }
 
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 10px 20px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background-color: #126ba7;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+        }
+
         /* Responsive adjustments */
         @media (max-width: 768px) {
             body {
@@ -240,28 +287,30 @@
 <div class="container">
     <h2>Staff Management</h2>
 
-    <% if (message != null) { %>
-    <p class="message"><%= message %></p>
-    <% } %>
+    <!-- Back to Dashboard Button -->
+    <a class="back-btn" href="<%= request.getContextPath() %>/<%= "admin".equalsIgnoreCase(userRole) ? "adminDashboard.jsp" : "staffDashboard.jsp" %>">← Back to Dashboard</a>
 
     <div class="form-section">
         <h3>Add New Staff</h3>
-        <form method="post" action="staff-management">
+        <form method="post" action="staff-management" onsubmit="return validateStaffForm()">
             <input type="hidden" name="action" value="add" />
 
             <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required />
+                <small id="usernameHelp" class="error"></small>
             </div>
 
             <div class="form-group">
                 <label for="password">Password:</label>
                 <input type="password" id="password" name="password" required />
+                <small id="passwordHelp" class="error"></small>
             </div>
 
             <div class="form-group">
                 <label for="fullName">Full Name:</label>
                 <input type="text" id="fullName" name="fullName" required />
+                <small id="fullNameHelp" class="error"></small>
             </div>
 
             <div class="form-actions">
@@ -305,6 +354,45 @@
         </table>
         <% } %>
     </div>
+    <script>
+        function validateStaffForm() {
+            let valid = true;
+
+            // Username Validation (alphanumeric, min 4 chars)
+            const username = document.getElementById("username").value.trim();
+            const usernameHelp = document.getElementById("usernameHelp");
+            const usernameRegex = /^[A-Za-z0-9_]{4,}$/;
+            if (!usernameRegex.test(username)) {
+                usernameHelp.textContent = "Username must be at least 4 characters (letters, numbers, underscores only).";
+                valid = false;
+            } else {
+                usernameHelp.textContent = "";
+            }
+
+            // Password Validation (min 4 chars)
+            const password = document.getElementById("password").value.trim();
+            const passwordHelp = document.getElementById("passwordHelp");
+            if (password.length < 4) {
+                passwordHelp.textContent = "Password must be at least 4 characters long.";
+                valid = false;
+            } else {
+                passwordHelp.textContent = "";
+            }
+
+            // Full Name Validation (letters and spaces only, min 3 chars)
+            const fullName = document.getElementById("fullName").value.trim();
+            const fullNameHelp = document.getElementById("fullNameHelp");
+            const nameRegex = /^[A-Za-z\s]{3,}$/;
+            if (!nameRegex.test(fullName)) {
+                fullNameHelp.textContent = "Full name must contain only letters and spaces, min 3 characters.";
+                valid = false;
+            } else {
+                fullNameHelp.textContent = "";
+            }
+
+            return valid;
+        }
+    </script>
 </div>
 </body>
 </html>
